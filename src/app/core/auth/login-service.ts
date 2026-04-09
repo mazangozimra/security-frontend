@@ -1,16 +1,19 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpErrorResponse, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { LoginModel } from '../model/login-model';
 import { throwError } from 'rxjs/internal/observable/throwError';
 import { TokenService } from './token-service';
+import {Router} from '@angular/router';
 
 @Injectable({
   providedIn: 'root',
 })
 export class LoginService {
 
+  private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
+  
   private baseUrl = 'http://localhost:7004';
   
   private httpOptions = {
@@ -20,7 +23,13 @@ export class LoginService {
   constructor(
     private http: HttpClient,
     private tokenService: TokenService,
-  ) {}
+    private router: Router
+  ) {
+    const token = localStorage.getItem('auth_token');
+    if (token) {
+      this.isAuthenticatedSubject.next(true);
+    }
+  }
   
   authenticate(username: string, password: string, systemId: number, rememberMe: boolean = false): Observable<LoginModel> {
     
@@ -39,7 +48,9 @@ export class LoginService {
             this.tokenService.setToken(response.token, rememberMe);
             console.log('Token stored successfully');
             
-            // Log decoded token info for debugging
+            this.isAuthenticatedSubject.next(true);
+            console.log('Authentication state updated to:', this.isAuthenticatedSubject.value);
+            
             const decoded = this.tokenService.getDecodedToken();
             console.log('Token payload:', decoded);
             console.log('User roles:', this.tokenService.getUserRoles());
@@ -50,10 +61,20 @@ export class LoginService {
       );
   }
 
+  isAuthenticated(): boolean {
+    const isAuth = this.isAuthenticatedSubject.value;
+    console.log('isAuthenticated() called, returning:', isAuth);
+    return isAuth
+  }
+
+  getAuthStatus(): Observable<boolean> {
+    return this.isAuthenticatedSubject.asObservable();
+  }
 
   logout(): void {
     this.tokenService.clearToken();
-    // Navigate to login page if needed
+    this.isAuthenticatedSubject.next(false);
+    this.router.navigate(['/login']);
   }
 
   private handleError(error: HttpErrorResponse) {

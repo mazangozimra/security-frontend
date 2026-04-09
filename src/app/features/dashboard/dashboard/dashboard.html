@@ -1,0 +1,88 @@
+<!-- features/dashboard/dashboard.html -->
+<div class="dashboard-container">
+  <nav class="sidebar">
+    <div class="sidebar-header">
+      <h2>MyApp</h2>
+    </div>
+    
+    <ul class="nav-menu">
+      <li>
+        <a routerLink="/dashboard" routerLinkActive="active">
+          <span class="icon">📊</span>
+          Dashboard
+        </a>
+      </li>
+      <li>
+        <a routerLink="/profile" routerLinkActive="active">
+          <span class="icon">👤</span>
+          Profile
+        </a>
+      </li>
+      <li>
+        <a routerLink="/settings" routerLinkActive="active">
+          <span class="icon">⚙️</span>
+          Settings
+        </a>
+      </li>
+    </ul>
+    
+    <div class="sidebar-footer">
+      <button (click)="logout()" class="logout-btn">
+        <span class="icon">🚪</span>
+        Logout
+      </button>
+    </div>
+  </nav>
+  
+  <main class="main-content">
+    <header class="top-bar">
+      <div class="user-info">
+        <span class="username">Welcome, {{ username }}!</span>
+        <span class="user-roles" *ngIf="userRoles.length > 0">
+          Roles: {{ userRoles.join(', ') }}
+        </span>
+        <span class="token-expiry" *ngIf="tokenExpiry">
+          Token expires: {{ tokenExpiry | date:'medium' }}
+        </span>
+      </div>
+    </header>
+    
+    <div class="content">
+      <h1>Dashboard</h1>
+      
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">📈</div>
+          <div class="stat-info">
+            <h3>Total Revenue</h3>
+            <p class="stat-number">$12,345</p>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon">👥</div>
+          <div class="stat-info">
+            <h3>Active Users</h3>
+            <p class="stat-number">1,234</p>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon">✅</div>
+          <div class="stat-info">
+            <h3>Tasks Completed</h3>
+            <p class="stat-number">89%</p>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon">🔄</div>
+          <div class="stat-info">
+            <h3>System Status</h3>
+            <p class="stat-number online">Online</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
