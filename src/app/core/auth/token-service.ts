@@ -8,16 +8,10 @@ import { TokenPayload } from '../model/token-payload';
 })
 export class TokenService {
   
-  /**
-   * Get the raw token from storage
-   */
   getToken(): string | null {
     return localStorage.getItem('token') || sessionStorage.getItem('token');
   }
   
-  /**
-   * Decode and get the token payload
-   */
   getDecodedToken(): TokenPayload | null {
     const token = this.getToken();
     if (!token) return null;
@@ -31,33 +25,22 @@ export class TokenService {
     }
   }
   
-  /**
-   * Get token expiration from the JWT itself
-   */
   getTokenExpiration(): Date | null {
     const decoded = this.getDecodedToken();
     if (!decoded || !decoded.exp) return null;
     
-    // exp is in seconds, convert to milliseconds
     const expirationDate = new Date(decoded.exp * 1000);
     return expirationDate;
   }
   
-  /**
-   * Check if token is expired using JWT claims
-   */
   isTokenExpired(): boolean {
     const expiration = this.getTokenExpiration();
     if (!expiration) return true;
     
-    // Add a small buffer (e.g., 5 minutes) for safety
     const bufferMs = 5 * 60 * 1000; // 5 minutes
     return new Date().getTime() + bufferMs > expiration.getTime();
   }
   
-  /**
-   * Validate token (exists, not expired, etc.)
-   */
   isTokenValid(): boolean {
     const token = this.getToken();
     if (!token) return false;
@@ -65,43 +48,28 @@ export class TokenService {
     return !this.isTokenExpired();
   }
   
-  /**
-   * Get user roles from token
-   */
   getUserRoles(): string[] {
     const decoded = this.getDecodedToken();
     if (!decoded) return [];
     
-    // Handle different role field names (roles, authorities, permissions, etc.)
     return decoded.roles || []; 
-    //|| decoded.authorities || decoded.permissions || [];
   }
   
-  /**
-   * Check if user has a specific role
-   */
   hasRole(role: string): boolean {
     const roles = this.getUserRoles();
     return roles.includes(role);
   }
   
-  /**
-   * Check if user has any of the specified roles
-   */
   hasAnyRole(roles: string[]): boolean {
     const userRoles = this.getUserRoles();
     return roles.some(role => userRoles.includes(role));
   }
   
-  /**
-   * Get username from token
-   */
   getUsername(): string | null {
     const decoded = this.getDecodedToken();
     if (!decoded) return null;
     
     return decoded.sub || null;
-    // decoded.sub || decoded.email || null;
   }
   
   getRemainingTime(): number {
@@ -134,7 +102,6 @@ export class TokenService {
     const storage = rememberMe ? localStorage : sessionStorage;
     storage.setItem('token', token);
     
-    // Optional: Also store the decoded expiration for quick access
     try {
       const decoded = jwtDecode<TokenPayload>(token);
       if (decoded.exp) {

@@ -14,6 +14,7 @@ import { Router } from '@angular/router';
 })
 export class Login {
 
+  isLoggedIn: any;
   loginForm!: FormGroup;
 
   constructor(
@@ -24,6 +25,8 @@ export class Login {
   
   ngOnInit(): void {
     
+    //this.isLoggedIn = !!localStorage.getItem(this.tokenKey);
+  
     console.log('Login component initialized');
     console.log('Is authenticated?', this.loginService.isAuthenticated());
 

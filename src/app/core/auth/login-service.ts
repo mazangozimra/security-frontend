@@ -25,10 +25,21 @@ export class LoginService {
     private tokenService: TokenService,
     private router: Router
   ) {
+    this.checkInitialAuthState();
     const token = localStorage.getItem('auth_token');
     if (token) {
       this.isAuthenticatedSubject.next(true);
     }
+  }
+
+  private checkInitialAuthState(): void {
+    const token = this.tokenService.getToken();
+    const isValid = token ? this.tokenService.isTokenValid() : false;
+    
+    console.log('Initial auth check - Token exists:', !!token);
+    console.log('Initial auth check - Token valid:', isValid);
+    
+    this.isAuthenticatedSubject.next(isValid);
   }
   
   authenticate(username: string, password: string, systemId: number, rememberMe: boolean = false): Observable<LoginModel> {
@@ -55,6 +66,14 @@ export class LoginService {
             console.log('Token payload:', decoded);
             console.log('User roles:', this.tokenService.getUserRoles());
             console.log('Token expires:', this.tokenService.getTokenExpiration());
+          
+            this.isAuthenticatedSubject.next(true);
+            console.log('Authentication state updated to:', this.isAuthenticatedSubject.value);
+
+            const username = this.tokenService.getUsername();
+            const roles = this.tokenService.getUserRoles();
+            console.log('User:', username);
+            console.log('Roles:', roles);
           }
         }),
         catchError(this.handleError)
@@ -62,9 +81,16 @@ export class LoginService {
   }
 
   isAuthenticated(): boolean {
-    const isAuth = this.isAuthenticatedSubject.value;
-    console.log('isAuthenticated() called, returning:', isAuth);
-    return isAuth
+    const token = this.tokenService.getToken();
+    const isValid = token ? this.tokenService.isTokenValid() : false;
+    
+    if (this.isAuthenticatedSubject.value !== isValid) {
+      console.log('Syncing auth state - was:', this.isAuthenticatedSubject.value, 'now:', isValid);
+      this.isAuthenticatedSubject.next(isValid);
+    }
+    
+    console.log('isAuthenticated() called, returning:', isValid);
+    return isValid;
   }
 
   getAuthStatus(): Observable<boolean> {
