@@ -1,88 +1,113 @@
 <!-- features/dashboard/dashboard.html -->
 <div class="dashboard-container">
+  <!-- Sticky Sidebar Navigation -->
   <nav class="sidebar">
     <div class="sidebar-header">
       <h2>MyApp</h2>
+      <p class="system-name">Enterprise Suite</p>
     </div>
     
     <ul class="nav-menu">
       <li>
-        <a routerLink="/dashboard" routerLinkActive="active">
+        <a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
           <span class="icon">📊</span>
-          Dashboard
+          <span class="nav-text">Dashboard</span>
+        </a>
+      </li>
+      <li class="nav-divider">Management</li>
+      <li>
+        <a routerLink="/systems" routerLinkActive="active">
+          <span class="icon">🖥️</span>
+          <span class="nav-text">Systems</span>
+          <span class="badge" *ngIf="systemCount > 0">{{ systemCount }}</span>
         </a>
       </li>
       <li>
+        <a routerLink="/roles" routerLinkActive="active">
+          <span class="icon">🔐</span>
+          <span class="nav-text">Roles</span>
+          <span class="badge" *ngIf="roleCount > 0">{{ roleCount }}</span>
+        </a>
+      </li>
+      <li>
+        <a routerLink="/users" routerLinkActive="active">
+          <span class="icon">👥</span>
+          <span class="nav-text">Users</span>
+          <span class="badge" *ngIf="userCount > 0">{{ userCount }}</span>
+        </a>
+      </li>
+      <li>
+        <a routerLink="/departments" routerLinkActive="active">
+          <span class="icon">🏢</span>
+          <span class="nav-text">Departments</span>
+          <span class="badge" *ngIf="departmentCount > 0">{{ departmentCount }}</span>
+        </a>
+      </li>
+      <li class="nav-divider"></li>
+      <li>
         <a routerLink="/profile" routerLinkActive="active">
           <span class="icon">👤</span>
-          Profile
+          <span class="nav-text">Profile</span>
         </a>
       </li>
       <li>
         <a routerLink="/settings" routerLinkActive="active">
           <span class="icon">⚙️</span>
-          Settings
+          <span class="nav-text">Settings</span>
         </a>
       </li>
     </ul>
     
     <div class="sidebar-footer">
+      <div class="user-info-sidebar">
+        <div class="user-avatar">{{ username?.charAt(0) || 'U' }}</div>
+        <div class="user-details">
+          <span class="user-name">{{ username || 'User' }}</span>
+          <span class="user-role" *ngIf="userRoles.length > 0">{{ userRoles[0] }}</span>
+        </div>
+      </div>
       <button (click)="logout()" class="logout-btn">
         <span class="icon">🚪</span>
-        Logout
+        <span class="nav-text">Logout</span>
       </button>
     </div>
   </nav>
   
+  <!-- Main Content Area -->
   <main class="main-content">
     <header class="top-bar">
+      <div class="top-bar-left">
+        <button class="mobile-menu-btn" (click)="toggleSidebar()">☰</button>
+        <h1 class="page-title">{{ currentPageTitle }}</h1>
+      </div>
       <div class="user-info">
-        <span class="username">Welcome, {{ username }}!</span>
+        <div class="notification-icon">
+          🔔
+          <span class="notification-badge" *ngIf="notificationCount > 0">{{ notificationCount }}</span>
+        </div>
+        <div class="user-dropdown" (click)="toggleUserMenu()">
+          <div class="user-avatar-small">{{ username?.charAt(0) || 'U' }}</div>
+          <span class="username">{{ username }}</span>
+          <span class="dropdown-arrow">▼</span>
+        </div>
+        <div class="user-menu" *ngIf="userMenuOpen">
+          <a routerLink="/profile">Profile</a>
+          <a routerLink="/settings">Settings</a>
+          <hr>
+          <button (click)="logout()">Logout</button>
+        </div>
         <span class="user-roles" *ngIf="userRoles.length > 0">
-          Roles: {{ userRoles.join(', ') }}
+          {{ userRoles.join(', ') }}
         </span>
         <span class="token-expiry" *ngIf="tokenExpiry">
-          Token expires: {{ tokenExpiry | date:'medium' }}
+          Token expires: {{ tokenExpiry | date:'shortTime' }}
         </span>
       </div>
     </header>
     
+    <!-- Router Outlet for Child Routes -->
     <div class="content">
-      <h1>Dashboard</h1>
-      
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-icon">📈</div>
-          <div class="stat-info">
-            <h3>Total Revenue</h3>
-            <p class="stat-number">$12,345</p>
-          </div>
-        </div>
-        
-        <div class="stat-card">
-          <div class="stat-icon">👥</div>
-          <div class="stat-info">
-            <h3>Active Users</h3>
-            <p class="stat-number">1,234</p>
-          </div>
-        </div>
-        
-        <div class="stat-card">
-          <div class="stat-icon">✅</div>
-          <div class="stat-info">
-            <h3>Tasks Completed</h3>
-            <p class="stat-number">89%</p>
-          </div>
-        </div>
-        
-        <div class="stat-card">
-          <div class="stat-icon">🔄</div>
-          <div class="stat-info">
-            <h3>System Status</h3>
-            <p class="stat-number online">Online</p>
-          </div>
-        </div>
-      </div>
+      <router-outlet></router-outlet>
     </div>
   </main>
 </div>

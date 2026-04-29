@@ -9,7 +9,9 @@ import { TokenPayload } from '../model/token-payload';
 export class TokenService {
   
   getToken(): string | null {
-    return localStorage.getItem('token') || sessionStorage.getItem('token');
+    return localStorage.getItem('token') || 
+          sessionStorage.getItem('token') || 
+          localStorage.getItem('auth_token'); // Add backward compatibility
   }
   
   getDecodedToken(): TokenPayload | null {

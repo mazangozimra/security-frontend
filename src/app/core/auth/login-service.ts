@@ -26,7 +26,7 @@ export class LoginService {
     private router: Router
   ) {
     this.checkInitialAuthState();
-    const token = localStorage.getItem('auth_token');
+    const token = this.tokenService.getToken();
     if (token) {
       this.isAuthenticatedSubject.next(true);
     }
